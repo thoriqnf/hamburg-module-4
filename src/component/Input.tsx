@@ -12,6 +12,7 @@ function Input() {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ProductForm>();
 
   const onSubmitFunction = async (values: ProductForm) => {
@@ -34,6 +35,7 @@ function Input() {
       if (!response.ok) throw new Error("post failed");
       const data = await response.json();
       console.log("data", data);
+      reset();
     } catch (e) {}
   };
 
