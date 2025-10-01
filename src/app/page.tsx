@@ -1,22 +1,13 @@
 "use client";
-import Button from "@/component/Button";
-import Counter from "@/component/Counter";
-import EmailInput from "@/component/EmailInput";
-import MyComponent from "@/component/MyComponent";
-import Image from "next/image";
+
+import Link from "next/link";
 
 export default function Home() {
-  const handleClick = () => {
-    console.log("click");
-  };
   return (
     <>
-      <MyComponent title="Ini title" subTitle="ini subtitle" />
-      <Button onClick={handleClick} variant="primary">
-        Click me
-      </Button>
-      <Counter />
-      <EmailInput />
+      <h1>Halaman Home</h1>
+      <Link href="/about">Go to abouts</Link>
+      <a href="/about">Go to abouts</a>
     </>
   );
 }

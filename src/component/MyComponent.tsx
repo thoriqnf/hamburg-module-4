@@ -9,7 +9,7 @@ interface Props {
 //   return <div>MyComponent {title}</div>;
 // };
 
-function MyComponent({ title, subTitle }: Props) {
+function MyComponent({ title, subTitle = "No Sub Title" }: Props) {
   return <div>MyComponent {title}</div>;
 }
 

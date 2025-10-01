@@ -8,7 +8,11 @@ interface ButtonProps {
 }
 
 function Button({ children, onClick, variant }: ButtonProps) {
-  return <button onClick={onClick}>{children}</button>;
+  return (
+    <button className={`btn ${variant}`} onClick={onClick}>
+      {children}
+    </button>
+  );
 }
 
 export default Button;
