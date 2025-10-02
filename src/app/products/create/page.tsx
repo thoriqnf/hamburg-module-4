@@ -74,7 +74,3 @@ export default function CreateProductPage() {
   );
 }
 
-export const metadata = {
-  title: 'Create New Product',
-  description: 'Add a new product to your catalog',
-};

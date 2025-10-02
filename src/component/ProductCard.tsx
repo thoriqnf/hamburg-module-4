@@ -1,6 +1,7 @@
 "use client";
 import { Product } from '@/types/product';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ProductCardProps {
   product: Product;
@@ -26,10 +27,14 @@ export default function ProductCard({ product, onDelete, showActions = false }: 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
       <div className="relative h-48 bg-gray-700">
-        <img
+        {/* TODO 22: Add Next.js Image component for optimization */}
+        {/* Replace regular img tag with Next.js Image for better performance */}
+        <Image
           src={product.thumbnail}
           alt={product.title}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=No+Image';
           }}
