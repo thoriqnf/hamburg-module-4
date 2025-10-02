@@ -13,16 +13,14 @@ export default function ProductCard({ product, onDelete, showActions = false }: 
   // TODO 6: Add delete handler with confirmation
   // This should confirm before calling onDelete prop
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      onDelete?.(product.id);
-    }
+    // TODO: Implement delete confirmation logic
+    console.log('TODO: Implement delete handler with confirmation');
   };
 
   // TODO 7: Calculate discounted price display
   // Show original price and discounted price if discount exists
-  const discountedPrice = product.discountPercentage
-    ? (product.price * (1 - product.discountPercentage / 100)).toFixed(2)
-    : product.price.toFixed(2);
+  // TODO: Implement discounted price calculation
+  const discountedPrice = product.price.toFixed(2);
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">

@@ -159,6 +159,17 @@ After completing all TODO items, you'll have:
 - Working knowledge of React Hook Form
 - Complete dark-themed UI with Tailwind CSS
 
+---
+
+## 📂 Branch Structure
+
+- **`starter` branch** - Incomplete code with TODOs (current branch)
+- **`finish` branch** - Completed working code (after demo)
+
+## 🏁 Current Status: Starter Branch
+
+This branch contains the **incomplete starter code** with TODOs for you to complete during the demo. All pages load without errors, but the functionality needs to be implemented by following the numbered TODO items.
+
 ## 🔗 Useful Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)

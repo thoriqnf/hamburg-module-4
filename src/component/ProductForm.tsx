@@ -1,4 +1,5 @@
 "use client";
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Product, ProductFormData } from '@/types/product';
 import { createProduct } from '@/lib/api';
@@ -35,31 +36,9 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
   // TODO 12: Implement form submission handler
   // This should handle both create and update operations, validate data
   const onSubmit = async (data: ProductFormData) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const productData = {
-        ...data,
-        price: Number(data.price),
-        discountPercentage: Number(data.discountPercentage),
-        stock: Number(data.stock),
-        images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : [],
-      };
-
-      const result = await createProduct(productData);
-
-      if (!product) {
-        reset();
-      }
-
-      onSuccess?.(result);
-    } catch (err) {
-      setError(product ? 'Failed to update product.' : 'Failed to create product.');
-      console.error('Error saving product:', err);
-    } finally {
-      setLoading(false);
-    }
+    // TODO: Implement form submission logic with validation
+    console.log('TODO: Implement form submission handler');
+    setLoading(false);
   };
 
   const categoryOptions = [

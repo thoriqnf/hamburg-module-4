@@ -8,12 +8,13 @@ export default function ProductsPage() {
   // TODO 14: Add search functionality
   // Handle search input changes and form submission
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    // TODO: Implement search input change handler
+    console.log('TODO: Implement search functionality');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled by the ProductList component
+    // TODO: Implement search form submission
+    console.log('TODO: Implement search form submission');
   };
 
   return (

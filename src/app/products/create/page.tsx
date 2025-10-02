@@ -9,9 +9,8 @@ export default function CreateProductPage() {
   // TODO 18: Add success handler and navigation
   // Handle successful product creation and show appropriate feedback
   const handleProductCreate = async (product: Product) => {
-    // TODO: Show success message and redirect to product detail
-    alert(`Product "${product.title}" created successfully!`);
-    router.push(`/products/${product.id}`);
+    // TODO: Implement success handler and navigation
+    console.log('TODO: Implement success handler and navigation');
   };
 
   const handleCancel = () => {

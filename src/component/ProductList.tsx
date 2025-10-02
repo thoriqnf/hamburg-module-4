@@ -16,29 +16,23 @@ export default function ProductList({ showActions = false }: ProductListProps) {
   // TODO 9: Implement fetchProducts function with error handling
   // This should fetch products and update state, handle loading/error states
   const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await getProducts();
-      setProducts(response.products);
-    } catch (err) {
-      setError('Failed to fetch products. Please try again.');
-      console.error('Error fetching products:', err);
-    } finally {
-      setLoading(false);
-    }
+    // TODO: Implement fetchProducts logic with error handling
+    console.log('TODO: Implement fetchProducts with error handling');
+    setLoading(false);
   };
 
   // TODO 10: Add useEffect to fetch products on mount
   // This should call fetchProducts when component mounts
   useEffect(() => {
-    fetchProducts();
+    // TODO: Call fetchProducts when component mounts
+    console.log('TODO: Add useEffect to fetch products on mount');
   }, []);
 
   // TODO 11: Add handleDelete function
   // This should remove product from state after deletion
   const handleDelete = (id: number) => {
-    setProducts(products.filter(product => product.id !== id));
+    // TODO: Implement handleDelete logic
+    console.log('TODO: Implement handleDelete function');
   };
 
   if (loading) {
