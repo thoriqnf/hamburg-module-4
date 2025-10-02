@@ -6,28 +6,89 @@ const DUMMYJSON_API_BASE = 'https://dummyjson.com';
 // TODO 3: Implement getProducts function to fetch all products
 // Use axios to fetch from DummyJSON and return ProductsResponse
 export async function getProducts(): Promise<ProductsResponse> {
-  // TODO: Replace this placeholder with actual axios implementation
-  console.log('TODO: Implement getProducts with axios');
-  return {
-    products: [],
-    total: 0,
-    skip: 0,
-    limit: 10,
-  };
+  try {
+    const response = await axios.get(`${DUMMYJSON_API_BASE}/products?limit=10`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw new Error('Failed to fetch products');
+  }
 }
 
 // TODO 4: Implement getProduct function to fetch single product
 // Use axios to fetch one product by ID from DummyJSON
 export async function getProduct(id: number): Promise<Product> {
-  // TODO: Replace this placeholder with actual axios implementation
-  console.log('TODO: Implement getProduct with axios');
-  throw new Error('Not implemented yet');
+  try {
+    const response = await axios.get(`${DUMMYJSON_API_BASE}/products/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    throw new Error('Failed to fetch product');
+  }
 }
 
 // TODO 5: Implement createProduct function to add new product
 // Use axios to POST new product data to DummyJSON
 export async function createProduct(data: ProductFormData): Promise<Product> {
-  // TODO: Replace this placeholder with actual axios implementation
-  console.log('TODO: Implement createProduct with axios');
-  throw new Error('Not implemented yet');
+  try {
+    const productData = {
+      title: data.title,
+      description: data.description,
+      price: Number(data.price),
+      discountPercentage: Number(data.discountPercentage),
+      stock: Number(data.stock),
+      brand: data.brand,
+      category: data.category,
+      thumbnail: data.thumbnail || undefined,
+      images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : [],
+    };
+
+    const response = await axios.post(`${DUMMYJSON_API_BASE}/products/add`, productData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw new Error('Failed to create product');
+  }
+}
+
+// Additional CRUD functions for complete functionality
+export async function updateProduct(id: number, data: Partial<ProductFormData>): Promise<Product> {
+  try {
+    const productData = {
+      title: data.title,
+      description: data.description,
+      price: data.price ? Number(data.price) : undefined,
+      discountPercentage: data.discountPercentage !== undefined ? Number(data.discountPercentage) : undefined,
+      stock: data.stock !== undefined ? Number(data.stock) : undefined,
+      brand: data.brand,
+      category: data.category,
+      thumbnail: data.thumbnail,
+      images: data.images ? data.images.split(',').map(img => img.trim()).filter(Boolean) : undefined,
+    };
+
+    const response = await axios.put(`${DUMMYJSON_API_BASE}/products/${id}`, productData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw new Error('Failed to update product');
+  }
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  try {
+    await axios.delete(`${DUMMYJSON_API_BASE}/products/${id}`);
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    throw new Error('Failed to delete product');
+  }
+}
+
+export async function searchProducts(query: string): Promise<ProductsResponse> {
+  try {
+    const response = await axios.get(`${DUMMYJSON_API_BASE}/products/search?q=${encodeURIComponent(query)}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw new Error('Failed to search products');
+  }
 }

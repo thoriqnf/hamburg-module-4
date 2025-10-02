@@ -1,20 +1,42 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductList from '@/component/ProductList';
+import { searchProducts } from '@/lib/api';
+import { Product } from '@/types/product';
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<Product[] | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   // TODO 14: Add search functionality
   // Handle search input changes and form submission
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // TODO: Implement search input change handler
-    console.log('TODO: Implement search functionality');
+    setSearchQuery(e.target.value);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    // TODO: Implement search form submission
-    console.log('TODO: Implement search form submission');
+  const handleSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      setSearchResults(null);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const results = await searchProducts(searchQuery);
+      setSearchResults(results.products);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSearchResults(null);
   };
 
   return (
@@ -45,7 +67,7 @@ export default function ProductsPage() {
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={handleClearSearch}
                 className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors"
               >
                 Clear
@@ -56,8 +78,9 @@ export default function ProductsPage() {
 
         <div className="mb-6 flex justify-between items-center">
           <div className="text-gray-400">
-            {searchQuery && `Searching for "${searchQuery}"`}
-            {!searchQuery && 'All Products'}
+            {isSearching && `Searching for "${searchQuery}"...`}
+            {searchResults && !isSearching && `Found ${searchResults.length} results for "${searchQuery}"`}
+            {searchResults === null && !isSearching && 'All Products'}
           </div>
           <button
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors flex items-center"
@@ -71,7 +94,12 @@ export default function ProductsPage() {
         </div>
 
         {/* TODO 15: Add ProductList component with proper props */}
-        <ProductList showActions={true} />
+        <ProductList
+          showActions={true}
+          searchResults={searchResults}
+          isSearching={isSearching}
+          searchQuery={searchQuery}
+        />
 
         <div className="mt-12 text-center">
           <a href="/" className="text-gray-400 hover:text-white transition-colors inline-flex items-center">

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Product, ProductFormData } from '@/types/product';
-import { createProduct } from '@/lib/api';
+import { createProduct, updateProduct } from '@/lib/api';
 
 interface ProductFormProps {
   product?: Product;
@@ -32,13 +32,44 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // TODO 12: Implement form submission handler
   // This should handle both create and update operations, validate data
   const onSubmit = async (data: ProductFormData) => {
-    // TODO: Implement form submission logic with validation
-    console.log('TODO: Implement form submission handler');
-    setLoading(false);
+    try {
+      setLoading(true);
+      setError(null);
+
+      const productData = {
+        title: data.title,
+        description: data.description,
+        price: Number(data.price),
+        discountPercentage: Number(data.discountPercentage),
+        stock: Number(data.stock),
+        brand: data.brand,
+        category: data.category,
+        thumbnail: data.thumbnail || '',
+        images: data.images,
+      };
+
+      let result: Product;
+      if (product) {
+        result = await updateProduct(product.id, productData);
+        setSuccessMessage('Product updated successfully!');
+      } else {
+        result = await createProduct(productData);
+        setSuccessMessage('Product created successfully!');
+        reset();
+      }
+
+      onSuccess?.(result);
+    } catch (err) {
+      setError(product ? 'Failed to update product. Please try again.' : 'Failed to create product. Please try again.');
+      console.error('Error saving product:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const categoryOptions = [
@@ -54,6 +85,9 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
 
       {error && (
         <div className="bg-red-600 text-white p-4 rounded-md mb-4">{error}</div>
+      )}
+      {successMessage && (
+        <div className="bg-green-600 text-white p-4 rounded-md mb-4">{successMessage}</div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

@@ -17,19 +17,28 @@ export default function EditProductPage() {
   // TODO 20: Add product data fetching
   // Fetch product data when component mounts
   useEffect(() => {
-    // TODO: Add fetchProduct call when component mounts
-    console.log('TODO: Add product data fetching');
-    setLoading(false);
+    if (productId) {
+      fetchProduct();
+    }
   }, [productId]);
 
   const fetchProduct = async () => {
-    // TODO: Implement fetchProduct logic with error handling
-    console.log('TODO: Implement fetchProduct function');
+    try {
+      setLoading(true);
+      setError(null);
+      const productData = await getProduct(Number(productId));
+      setProduct(productData);
+    } catch (err) {
+      setError('Failed to fetch product details.');
+      console.error('Error fetching product:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleProductUpdate = async (updatedProduct: Product) => {
-    // TODO: Implement product update handler
-    console.log('TODO: Implement product update handler');
+    alert(`Product "${updatedProduct.title}" updated successfully!`);
+    router.push(`/products/${productId}`);
   };
 
   const handleCancel = () => {

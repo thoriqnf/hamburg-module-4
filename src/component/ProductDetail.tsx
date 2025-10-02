@@ -16,14 +16,27 @@ export default function ProductDetail() {
   // TODO 13: Add useEffect to fetch product data
   // This should fetch product when component mounts, handle loading/error states
   useEffect(() => {
-    // TODO: Add fetchProduct call when component mounts
-    console.log('TODO: Add useEffect to fetch product data');
-    setLoading(false);
+    if (productId) {
+      fetchProduct();
+    }
   }, [productId]);
 
   const fetchProduct = async () => {
-    // TODO: Implement fetchProduct logic with error handling
-    console.log('TODO: Implement fetchProduct function');
+    try {
+      setLoading(true);
+      setError(null);
+      const productData = await getProduct(Number(productId));
+      setProduct(productData);
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('not found')) {
+        setError('Product not found. It may have been removed.');
+      } else {
+        setError('Failed to fetch product details. Please try again.');
+      }
+      console.error('Error fetching product:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateDiscountedPrice = () => {

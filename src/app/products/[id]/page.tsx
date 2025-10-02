@@ -6,8 +6,19 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   // TODO 16: Add product ID validation and error handling
   // Validate ID and show appropriate error if invalid
-  // TODO: Implement product ID validation logic
-  console.log('TODO: Implement product ID validation and error handling');
+  if (!isValidId) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Invalid Product ID</h1>
+          <p className="text-gray-400 mb-8">The product ID you provided is not valid.</p>
+          <a href="/products" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition-colors inline-block">
+            Back to Products
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900">
