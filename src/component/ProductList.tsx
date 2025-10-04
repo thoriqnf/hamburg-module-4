@@ -1,46 +1,93 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Product } from '@/types/product';
-import { getProducts, deleteProduct } from '@/lib/api';
 import ProductCard from './ProductCard';
 
 interface ProductListProps {
   showActions?: boolean;
-  searchResults?: Product[] | null;
+  searchResults?: any[] | null;
   isSearching?: boolean;
   searchQuery?: string;
+  onViewProduct?: (id: number) => void;
+  onEditProduct?: (id: number) => void;
+  getProducts?: () => Promise<any>;
 }
 
 export default function ProductList({
   showActions = false,
   searchResults = null,
   isSearching = false,
-  searchQuery = ''
+  searchQuery = '',
+  onViewProduct,
+  onEditProduct,
+  getProducts
 }: ProductListProps) {
+  // Product type - defined right here
+  interface Product {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string[];
+  }
+
+  // State - simple and clear
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO 9: Implement fetchProducts function with error handling
-  // This should fetch products and update state, handle loading/error states
+  // API function - right here in the component
   const fetchProducts = async () => {
+    if (getProducts) {
+      // Use the passed function from parent
+      return getProducts();
+    }
+
+    // Default API function
     try {
-      setLoading(true);
-      setError(null);
-      const response = await getProducts();
-      setProducts(response.products);
-    } catch (err) {
-      setError('Failed to fetch products. Please try again.');
-      console.error('Error fetching products:', err);
-    } finally {
-      setLoading(false);
+      const response = await fetch('https://dummyjson.com/products?limit=10');
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw new Error('Could not load products. Please try again.');
     }
   };
 
-  // TODO 10: Add useEffect to fetch products on mount
-  // This should call fetchProducts when component mounts
+  const deleteProduct = async (id: number) => {
+    try {
+      const response = await fetch(`https://dummyjson.com/products/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      // Remove product from state
+      setProducts(products.filter(product => product.id !== id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw new Error('Failed to delete product. Please try again.');
+    }
+  };
+
+  // Fetch products on mount
   useEffect(() => {
-    fetchProducts();
+    fetchProducts().then(data => {
+      setProducts(data.products || data);
+      setLoading(false);
+    }).catch(err => {
+      setError('Failed to fetch products. Please try again.');
+      setLoading(false);
+    });
   }, []);
 
   // Don't fetch if we have search results
@@ -49,18 +96,6 @@ export default function ProductList({
       setLoading(false);
     }
   }, [searchResults]);
-
-  // TODO 11: Add handleDelete function
-  // This should remove product from state after deletion
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteProduct(id);
-      setProducts(products.filter(product => product.id !== id));
-    } catch (err) {
-      setError('Failed to delete product. Please try again.');
-      console.error('Error deleting product:', err);
-    }
-  };
 
   // Show loading spinner when searching
   if (isSearching) {
@@ -85,7 +120,20 @@ export default function ProductList({
     return (
       <div className="text-center py-12">
         <p className="text-red-400 mb-4">{error}</p>
-        <button onClick={fetchProducts} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+        <button
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            fetchProducts().then(data => {
+              setProducts(data.products || data);
+              setLoading(false);
+            }).catch(err => {
+              setError('Failed to fetch products. Please try again.');
+              setLoading(false);
+            });
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+        >
           Retry
         </button>
       </div>
@@ -115,12 +163,14 @@ export default function ProductList({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {displayProducts.map((product) => (
+      {displayProducts.map((product: Product) => (
         <ProductCard
           key={product.id}
           product={product}
-          onDelete={handleDelete}
+          onDelete={deleteProduct}
           showActions={showActions}
+          onViewProduct={onViewProduct}
+          onEditProduct={onEditProduct}
         />
       ))}
     </div>

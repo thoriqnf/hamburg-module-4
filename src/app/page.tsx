@@ -20,7 +20,7 @@ export default function Home() {
           </Link>
 
           <div className="text-gray-400">
-            <p className="mb-2">📝 Complete 22 TODOs to build a full CRUD application</p>
+            <p className="mb-2">✅ Simplified & Complete - All features working!</p>
             <p className="text-sm">• Next.js App Router • TypeScript • Tailwind CSS • DummyJSON API</p>
           </div>
         </div>
@@ -39,9 +39,9 @@ export default function Home() {
             </p>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg">
-            <h3 className="text-white font-semibold mb-2">⏱ Time Estimate</h3>
+            <h3 className="text-white font-semibold mb-2">⏱ Time to Learn</h3>
             <p className="text-gray-400 text-sm">
-              Complete in ~2 hours with step-by-step guidance
+              Beginner-friendly! Complete CRUD in ~30 minutes
             </p>
           </div>
         </div>

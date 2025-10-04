@@ -1,16 +1,28 @@
 "use client";
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Product, ProductFormData } from '@/types/product';
-import { createProduct, updateProduct } from '@/lib/api';
 
 interface ProductFormProps {
-  product?: Product;
-  onSuccess?: (product: Product) => void;
+  product?: any;
+  onSuccess?: (product: any) => void;
   onCancel?: () => void;
+  onSubmit?: (data: any) => Promise<void>;
 }
 
-export default function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
+export default function ProductForm({ product, onSuccess, onCancel, onSubmit }: ProductFormProps) {
+  // Form data type - simple and clear
+  interface ProductFormData {
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string;
+  }
+
   const {
     register,
     handleSubmit,
@@ -34,36 +46,20 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // TODO 12: Implement form submission handler
-  // This should handle both create and update operations, validate data
-  const onSubmit = async (data: ProductFormData) => {
+  // Form submission handler - calls the onSubmit prop
+  const onFormSubmit = async (data: ProductFormData) => {
     try {
       setLoading(true);
       setError(null);
 
-      const productData = {
-        title: data.title,
-        description: data.description,
-        price: Number(data.price),
-        discountPercentage: Number(data.discountPercentage),
-        stock: Number(data.stock),
-        brand: data.brand,
-        category: data.category,
-        thumbnail: data.thumbnail || '',
-        images: data.images,
-      };
-
-      let result: Product;
-      if (product) {
-        result = await updateProduct(product.id, productData);
-        setSuccessMessage('Product updated successfully!');
-      } else {
-        result = await createProduct(productData);
-        setSuccessMessage('Product created successfully!');
-        reset();
+      if (onSubmit) {
+        await onSubmit(data);
+        setSuccessMessage(product ? 'Product updated successfully!' : 'Product created successfully!');
+        if (!product) {
+          reset();
+        }
+        onSuccess?.(data);
       }
-
-      onSuccess?.(result);
     } catch (err) {
       setError(product ? 'Failed to update product. Please try again.' : 'Failed to create product. Please try again.');
       console.error('Error saving product:', err);
@@ -90,7 +86,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
         <div className="bg-green-600 text-white p-4 rounded-md mb-4">{successMessage}</div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">Product Title *</label>

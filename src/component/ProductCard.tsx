@@ -7,9 +7,11 @@ interface ProductCardProps {
   product: Product;
   onDelete?: (id: number) => void;
   showActions?: boolean;
+  onViewProduct?: (id: number) => void;
+  onEditProduct?: (id: number) => void;
 }
 
-export default function ProductCard({ product, onDelete, showActions = false }: ProductCardProps) {
+export default function ProductCard({ product, onDelete, showActions = false, onViewProduct, onEditProduct }: ProductCardProps) {
   // TODO 6: Add delete handler with confirmation
   // This should confirm before calling onDelete prop
   const handleDelete = () => {
@@ -76,17 +78,23 @@ export default function ProductCard({ product, onDelete, showActions = false }: 
 
         {showActions ? (
           <div className="flex gap-2">
-            <Link href={`/products/${product.id}/edit`} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium text-center">
+            <button
+              onClick={() => onEditProduct?.(product.id)}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
               Edit
-            </Link>
+            </button>
             <button onClick={handleDelete} className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium">
               Delete
             </button>
           </div>
         ) : (
-          <Link href={`/products/${product.id}`} className="w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-center text-sm font-medium block">
+          <button
+            onClick={() => onViewProduct?.(product.id)}
+            className="w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-center text-sm font-medium"
+          >
             View Details
-          </Link>
+          </button>
         )}
       </div>
     </div>

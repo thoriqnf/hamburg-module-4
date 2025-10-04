@@ -1,16 +1,49 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
 import ProductList from '@/component/ProductList';
-import { searchProducts } from '@/lib/api';
-import { Product } from '@/types/product';
 
-export default function ProductsPage() {
+export default function ProductsListPage() {
+  // Product type - simple and clear, defined right here
+  interface Product {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    discountPercentage: number;
+    rating: number;
+    stock: number;
+    brand: string;
+    category: string;
+    thumbnail: string;
+    images: string[];
+  }
+
+  // Response type for API calls
+  interface ProductsResponse {
+    products: Product[];
+    total: number;
+    skip: number;
+    limit: number;
+  }
+
+  // API functions - right here in the component where they're used
+  const getProducts = async (): Promise<ProductsResponse> => {
+    const response = await fetch('https://dummyjson.com/products?limit=10');
+    return response.json();
+  };
+
+  const searchProducts = async (query: string): Promise<ProductsResponse> => {
+    const response = await fetch(`https://dummyjson.com/products/search?q=${encodeURIComponent(query)}`);
+    return response.json();
+  };
+
+  // State - easy to understand, right below the functions that use it
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Product[] | null>(null);
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  // TODO 14: Add search functionality
-  // Handle search input changes and form submission
+  // Event handlers - simple and clear
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -42,11 +75,13 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Products</h1>
           <p className="text-gray-400">Browse and manage our product catalog</p>
         </div>
 
+        {/* Search Bar */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
           <form onSubmit={handleSearchSubmit} className="flex space-x-4">
             <div className="flex-1 relative">
@@ -76,38 +111,56 @@ export default function ProductsPage() {
           </form>
         </div>
 
+        {/* Action Bar */}
         <div className="mb-6 flex justify-between items-center">
           <div className="text-gray-400">
             {isSearching && `Searching for "${searchQuery}"...`}
             {searchResults && !isSearching && `Found ${searchResults.length} results for "${searchQuery}"`}
             {searchResults === null && !isSearching && 'All Products'}
           </div>
-          <button
+
+          {/* Create Product Button - uses Next.js Link for routing */}
+          <Link
+            href="/products/create"
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors flex items-center"
-            onClick={() => window.location.href = '/products/create'}
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Create Product
-          </button>
+          </Link>
         </div>
 
-        {/* TODO 15: Add ProductList component with proper props */}
-        <ProductList
-          showActions={true}
-          searchResults={searchResults}
-          isSearching={isSearching}
-          searchQuery={searchQuery}
-        />
+        {/* Product List */}
+        <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+          <ProductList
+            showActions={true}
+            searchResults={searchResults}
+            isSearching={isSearching}
+            searchQuery={searchQuery}
+            onViewProduct={(productId) => {
+              // Navigate to product detail page
+              window.location.href = `/products/${productId}`;
+            }}
+            onEditProduct={(productId) => {
+              // Navigate to product edit page
+              window.location.href = `/products/${productId}/edit`;
+            }}
+            getProducts={getProducts}
+          />
+        </div>
 
+        {/* Footer Navigation */}
         <div className="mt-12 text-center">
-          <a href="/" className="text-gray-400 hover:text-white transition-colors inline-flex items-center">
+          <Link
+            href="/"
+            className="text-gray-400 hover:text-white transition-colors inline-flex items-center"
+          >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
