@@ -14,13 +14,20 @@ export default function Home() {
         <div className="space-y-4">
           <Link
             href="/products"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg w-full"
           >
             View Products Demo
           </Link>
 
+          <Link
+            href="/data-fetching"
+            className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg w-full"
+          >
+            🚀 Learn Data Fetching (SSR, ISR, SSG, CSR)
+          </Link>
+
           <div className="text-gray-400">
-            <p className="mb-2">✅ Simplified & Complete - All features working!</p>
+            <p className="mb-2">✅ Two complete demos - Pick what you want to learn!</p>
             <p className="text-sm">• Next.js App Router • TypeScript • Tailwind CSS • DummyJSON API</p>
           </div>
         </div>
