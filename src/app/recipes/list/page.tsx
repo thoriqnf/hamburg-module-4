@@ -1,17 +1,25 @@
 import RecipeCard from "@/components/recipe/RecipeCard";
 import Navigation from "@/components/recipe/Navigation";
 
-// Simple placeholder data for starter version
-const placeholderRecipes = [
-  { id: 1, name: "Recipe Placeholder 1", cuisine: "Italian", difficulty: "Easy", rating: 4.5, reviewCount: 100 },
-  { id: 2, name: "Recipe Placeholder 2", cuisine: "American", difficulty: "Medium", rating: 4.2, reviewCount: 50 },
-  { id: 3, name: "Recipe Placeholder 3", cuisine: "Asian", difficulty: "Easy", rating: 4.7, reviewCount: 75 },
-  { id: 4, name: "Recipe Placeholder 4", cuisine: "Mexican", difficulty: "Easy", rating: 4.6, reviewCount: 120 },
-  { id: 5, name: "Recipe Placeholder 5", cuisine: "French", difficulty: "Hard", rating: 4.8, reviewCount: 200 },
-  { id: 6, name: "Recipe Placeholder 6", cuisine: "Mediterranean", difficulty: "Medium", rating: 4.3, reviewCount: 80 }
-];
+// Fetch all recipes for ISR with 30-second revalidation
+export const revalidate = 30;
 
-export default function RecipesListPage() {
+async function getAllRecipes() {
+  try {
+    const res = await fetch('https://dummyjson.com/recipes');
+    if (!res.ok) throw new Error('Failed to fetch recipes');
+    const data = await res.json();
+    return data.recipes;
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    return [];
+  }
+}
+
+export default async function RecipesListPage() {
+  const recipes = await getAllRecipes();
+  const timestamp = new Date().toLocaleString();
+
   return (
     <div className="min-h-screen bg-gray-900">
       <Navigation />
@@ -40,15 +48,46 @@ export default function RecipesListPage() {
               type="text"
               placeholder="Search recipes..."
               className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+              onChange={(e) => {
+                const params = new URLSearchParams(window.location.search);
+                if (e.target.value) {
+                  params.set('search', e.target.value);
+                } else {
+                  params.delete('search');
+                }
+                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+              }}
             />
-            <select className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+            <select
+              className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+              onChange={(e) => {
+                const params = new URLSearchParams(window.location.search);
+                if (e.target.value) {
+                  params.set('cuisine', e.target.value);
+                } else {
+                  params.delete('cuisine');
+                }
+                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+              }}
+            >
               <option value="">All Cuisines</option>
               <option value="italian">Italian</option>
               <option value="american">American</option>
               <option value="asian">Asian</option>
               <option value="mexican">Mexican</option>
             </select>
-            <select className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600">
+            <select
+              className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
+              onChange={(e) => {
+                const params = new URLSearchParams(window.location.search);
+                if (e.target.value) {
+                  params.set('difficulty', e.target.value);
+                } else {
+                  params.delete('difficulty');
+                }
+                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+              }}
+            >
               <option value="">All Difficulties</option>
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
@@ -59,22 +98,13 @@ export default function RecipesListPage() {
 
         {/* Recipe Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {placeholderRecipes.map((recipe) => (
-            <div key={recipe.id} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-              <div className="bg-green-800 px-3 py-1 text-white text-sm font-semibold">
-                ISR
-              </div>
-              <div className="h-48 bg-gray-700 flex items-center justify-center">
-                <span className="text-gray-400">Recipe Image</span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-bold text-white mb-2">{recipe.name}</h3>
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <span>{recipe.cuisine}</span>
-                  <span>⭐ {recipe.rating}</span>
-                </div>
-              </div>
-            </div>
+          {recipes.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              strategy="ISR"
+              strategyColor="bg-green-800"
+            />
           ))}
         </div>
 
@@ -108,10 +138,13 @@ export default function RecipesListPage() {
           </div>
           <div className="mt-4 p-4 bg-gray-900 rounded-lg">
             <p className="text-green-600 font-mono text-sm">
-              Last updated: {new Date().toLocaleString()}
+              Page generated at: {timestamp}
             </p>
             <p className="text-yellow-600 font-mono text-sm mt-1">
-              💡 This page will refresh with new content automatically
+              💡 This page auto-refreshes every 30 seconds with new content!
+            </p>
+            <p className="text-blue-600 font-mono text-sm mt-1">
+              🔄 ISR in action - check back in 30 seconds to see updates
             </p>
           </div>
         </div>

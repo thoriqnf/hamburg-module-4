@@ -36,13 +36,17 @@ const mockRecipe = {
   mealType: ["dinner"]
 };
 
-// Mock function to check if recipe exists
+// Fetch recipe by ID for SSR
 async function getRecipe(id: string) {
-  // In starter version, we'll just return the mock recipe for ID "1"
-  if (id === "1") {
-    return mockRecipe;
+  try {
+    const res = await fetch(`https://dummyjson.com/recipes/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch recipe');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching recipe:', error);
+    return null;
   }
-  return null;
 }
 
 export default async function RecipeDetailPage({ params }: { params: { id: string } }) {

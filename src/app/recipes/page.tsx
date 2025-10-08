@@ -1,6 +1,22 @@
 import Link from "next/link";
 
-export default function RecipesHomePage() {
+// Fetch random recipe for SSR
+async function getRandomRecipe() {
+  try {
+    const res = await fetch('https://dummyjson.com/recipes/random');
+    if (!res.ok) throw new Error('Failed to fetch random recipe');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching random recipe:', error);
+    return null;
+  }
+}
+
+export default async function RecipesHomePage() {
+  const randomRecipe = await getRandomRecipe();
+  const timestamp = new Date().toLocaleString();
+
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -17,25 +33,67 @@ export default function RecipesHomePage() {
           </div>
         </div>
 
-        {/* Recipe of the Day Placeholder */}
+        {/* Recipe of the Day */}
         <div className="bg-gray-800 rounded-lg p-8 mb-12">
           <h2 className="text-2xl font-bold text-white mb-4">Recipe of the Day</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-700 rounded-lg h-48 flex items-center justify-center">
-              <span className="text-gray-400">Recipe Image Placeholder</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">Delicious Recipe Name</h3>
-              <p className="text-gray-300 mb-4">
-                This will show a random recipe fetched on every request using SSR.
-                Fresh content every time you visit!
-              </p>
-              <div className="flex items-center space-x-4 text-sm text-gray-400">
-                <span>⏱️ 30 mins</span>
-                <span>👥 4 servings</span>
-                <span>⭐ 4.5 rating</span>
+          {randomRecipe ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-gray-700 rounded-lg h-48 flex items-center justify-center overflow-hidden">
+                <img
+                  src={randomRecipe.image}
+                  alt={randomRecipe.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-2">{randomRecipe.name}</h3>
+                <p className="text-gray-300 mb-4">
+                  {randomRecipe.instructions.slice(0, 2).join(' ')}...
+                </p>
+                <div className="flex items-center space-x-4 text-sm text-gray-400">
+                  <span>⏱️ {randomRecipe.prepTimeMinutes + randomRecipe.cookTimeMinutes} mins</span>
+                  <span>👥 {randomRecipe.servings} servings</span>
+                  <span>⭐ {randomRecipe.rating}</span>
+                  <span>📊 {randomRecipe.difficulty}</span>
+                </div>
+                <div className="mt-4">
+                  <Link
+                    href={`/recipes/${randomRecipe.id}`}
+                    className="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    View Recipe →
+                  </Link>
+                </div>
               </div>
             </div>
+          ) : (
+            <div className="text-center text-gray-400">
+              <p>Failed to load recipe of the day. Please try again later.</p>
+            </div>
+          )}
+        </div>
+
+        {/* SSR Info */}
+        <div className="bg-gray-800 p-6 rounded-lg mb-12">
+          <h3 className="text-2xl font-bold text-white mb-4">🔄 SSR in Action</h3>
+          <div className="space-y-3 text-gray-300">
+            <p>
+              <strong className="text-orange-600">🔄 Fresh Data:</strong> This page fetches a new random recipe on every request
+            </p>
+            <p>
+              <strong className="text-orange-600">⚡ Fast First Load:</strong> The user receives fully rendered HTML with the recipe
+            </p>
+            <p>
+              <strong className="text-orange-600">👤 Perfect for:</strong> Dynamic content that changes frequently
+            </p>
+          </div>
+          <div className="mt-4 p-4 bg-gray-900 rounded-lg">
+            <p className="text-orange-600 font-mono text-sm">
+              <strong>Server rendered at:</strong> {timestamp}
+            </p>
+            <p className="text-yellow-600 font-mono text-sm mt-1">
+              💡 Refresh this page to see a different recipe and updated timestamp!
+            </p>
           </div>
         </div>
 
