@@ -3,10 +3,17 @@ import Link from "next/link";
 // Fetch random recipe for SSR
 async function getRandomRecipe() {
   try {
-    const res = await fetch('https://dummyjson.com/recipes/random');
-    if (!res.ok) throw new Error('Failed to fetch random recipe');
+    const res = await fetch('https://dummyjson.com/recipes');
+    if (!res.ok) throw new Error('Failed to fetch recipes');
     const data = await res.json();
-    return data;
+
+    // Select a random recipe from the list
+    if (data.recipes && data.recipes.length > 0) {
+      const randomIndex = Math.floor(Math.random() * data.recipes.length);
+      return data.recipes[randomIndex];
+    }
+
+    return null;
   } catch (error) {
     console.error('Error fetching random recipe:', error);
     return null;
