@@ -26,8 +26,15 @@ export default function Home() {
             🚀 Learn Data Fetching (SSR, ISR, SSG, CSR)
           </Link>
 
+          <Link
+            href="/recipes"
+            className="inline-block bg-orange-600 hover:bg-orange-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg w-full"
+          >
+            🍳 Recipe App Demo (SSR, ISR, SSG, CSR)
+          </Link>
+
           <div className="text-gray-400">
-            <p className="mb-2">✅ Two complete demos - Pick what you want to learn!</p>
+            <p className="mb-2">✅ Three complete demos - Pick what you want to learn!</p>
             <p className="text-sm">• Next.js App Router • TypeScript • Tailwind CSS • DummyJSON API</p>
           </div>
         </div>
