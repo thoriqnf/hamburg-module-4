@@ -1,5 +1,6 @@
 import RecipeCard from "@/components/recipe/RecipeCard";
 import Navigation from "@/components/recipe/Navigation";
+import SearchFilterBar from "@/components/recipe/SearchFilterBar";
 
 // Fetch all recipes for ISR with 30-second revalidation
 export const revalidate = 30;
@@ -42,59 +43,7 @@ export default async function RecipesListPage() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-gray-800 rounded-lg p-4 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
-              placeholder="Search recipes..."
-              className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-              onChange={(e) => {
-                const params = new URLSearchParams(window.location.search);
-                if (e.target.value) {
-                  params.set('search', e.target.value);
-                } else {
-                  params.delete('search');
-                }
-                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
-              }}
-            />
-            <select
-              className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-              onChange={(e) => {
-                const params = new URLSearchParams(window.location.search);
-                if (e.target.value) {
-                  params.set('cuisine', e.target.value);
-                } else {
-                  params.delete('cuisine');
-                }
-                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
-              }}
-            >
-              <option value="">All Cuisines</option>
-              <option value="italian">Italian</option>
-              <option value="american">American</option>
-              <option value="asian">Asian</option>
-              <option value="mexican">Mexican</option>
-            </select>
-            <select
-              className="bg-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600"
-              onChange={(e) => {
-                const params = new URLSearchParams(window.location.search);
-                if (e.target.value) {
-                  params.set('difficulty', e.target.value);
-                } else {
-                  params.delete('difficulty');
-                }
-                window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
-              }}
-            >
-              <option value="">All Difficulties</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-        </div>
+        <SearchFilterBar />
 
         {/* Recipe Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
