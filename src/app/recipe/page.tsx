@@ -2,6 +2,8 @@
 import React from "react";
 import Image from "next/image";
 import StateX from "@/components/StateX";
+import Link from "next/link";
+import DeleteButton from "@/component/DeleteButton";
 
 // halaman awal kita beri SSR
 
@@ -46,10 +48,28 @@ export default async function page() {
         <div key={item.id}>
           <h1>{item.name}</h1>
           <h1>{item.rating}</h1>
-          <img src={item.image} alt="" />
           <Image src={item.image} alt="image recipe" width={200} height={200} />
+          {/* <button
+            onClick={() => {
+              router.push(`/products/${item.id}/editpage`);
+            }}
+          >
+            edit
+          </button> */}
+          <Link href={`/recipe/${item.id}/edit`}>edit</Link>
+          <DeleteButton id={item.id} />
         </div>
       ))}
     </div>
   );
 }
+
+// bagaimana step by step kita buat fitur edit data
+// 1. kita ambil data dari id terserbut, artinya kita akan ambil get by id, dibagian sini kita bisa taroh form ke modal atau ke halaman lain atau paling gampang masukin prompt
+// 2. setelah get by id kita perlu pasang ke componentnya dahulu
+// 3. kita melakukan change event data formnya
+// 4. kita akan kirim datanya menggunakan method PUT
+
+// useRouter itu hanya bisa dipakai di CSR
+// Jika component itu adalah SSR harus menggunakan LINK
+// Kalau memang mau pakai CSR apakah bisa?
