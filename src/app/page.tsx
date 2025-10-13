@@ -13,6 +13,13 @@ export default function Home() {
 
         <div className="space-y-4">
           <Link
+            href="/login"
+            className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg w-full"
+          >
+            🛡️ Middleware & Auth Demo (NEW!)
+          </Link>
+
+          <Link
             href="/products"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors text-lg w-full"
           >
@@ -34,8 +41,8 @@ export default function Home() {
           </Link>
 
           <div className="text-gray-400">
-            <p className="mb-2">✅ Three complete demos - Pick what you want to learn!</p>
-            <p className="text-sm">• Next.js App Router • TypeScript • Tailwind CSS • DummyJSON API</p>
+            <p className="mb-2">✅ Four complete demos - Pick what you want to learn!</p>
+            <p className="text-sm">• Next.js App Router • TypeScript • Tailwind CSS • DummyJSON API • Middleware & Auth</p>
           </div>
         </div>
 
