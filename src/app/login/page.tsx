@@ -4,50 +4,93 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("emilys");
+  const [password, setPassword] = useState("emilyspass");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const errorParam = searchParams.get("error");
-    if (errorParam === "admin-required") {
-      setError("Admin access required");
-    } else if (errorParam === "login-required") {
-      setError("Please login");
-    }
+  // Simple cookie helper functions
+  const setCookie = (name: string, value: string, minutes: number = 30) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (minutes * 60 * 1000));
+    document.cookie = `${name}=${value}; path=/; expires=${expires.toUTCString()}`;
+  };
 
-    const token = localStorage.getItem("auth-token");
-    const savedRole = localStorage.getItem("user-role");
-    if (token && savedRole) {
-      const redirect =
-        searchParams.get("redirect") ||
-        (savedRole === "admin" ? "/admin" : "/user");
+  const getCookie = (name: string): string | null => {
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith(`${name}=`))
+      ?.split('=')[1] || null;
+  };
+
+  // Simple role assignment
+  const getUserRole = (username: string): 'admin' | 'user' => {
+    return username === 'emilys' ? 'admin' : 'user';
+  };
+
+  // Check if already logged in
+  useEffect(() => {
+    const token = getCookie('auth-token');
+    const savedUsername = getCookie('username');
+    if (token && savedUsername) {
+      const userRole = getUserRole(savedUsername);
+      const redirect = userRole === "admin" ? "/admin" : "/user";
       router.push(redirect);
     }
-  }, [searchParams, router]);
+  }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Handle login submission
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
-    if (username === "user" && password === "user") {
-      const mockToken = `mock-token-${Date.now()}`;
-      // localStorage.setItem('auth-token', mockToken)
-      // localStorage.setItem('user-role', 'user')
-      document.cookie = `auth-token=${mockToken}; path=/; max-age=3600`;
-      document.cookie = `user-role=user; path=/; Expires=Sun, 15 Jul 2026 00:00:01 GMT;`;
-      router.push(searchParams.get("redirect") || "/user");
-    } else if (username === "admin" && password === "admin") {
-      const mockToken = `mock-token-${Date.now()}`;
-      localStorage.setItem("auth-token", mockToken);
-      localStorage.setItem("user-role", "admin");
-      document.cookie = `auth-token=${mockToken}; max-age=3600`;
-      document.cookie = `user-role=admin; path=/; max-age=3600`;
-      router.push(searchParams.get("redirect") || "/admin");
-    } else {
-      setError("Invalid credentials");
+    try {
+      // Direct API call to DummyJSON
+      const response = await fetch('https://dummyjson.com/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          expiresInMins: 30,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+
+      const data = await response.json();
+
+      // Store authentication data in cookies
+      setCookie('auth-token', data.token, 30);
+      setCookie('username', username, 30);
+      setCookie('user-role', getUserRole(username), 30);
+
+      // Get and cache user data
+      const userResponse = await fetch('https://dummyjson.com/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+        },
+      });
+
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setCookie('user-data', JSON.stringify(userData), 30);
+      }
+
+      // Redirect based on role
+      const userRole = getUserRole(username);
+      const redirect = userRole === "admin" ? "/admin" : "/user";
+      router.push(redirect);
+
+    } catch (error) {
+      setError("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,14 +128,30 @@ export default function LoginPage() {
           />
         </div>
 
-        <button type="submit" style={{ padding: "10px 20px" }}>
-          Login
+        <button
+          type="submit"
+          disabled={isLoading}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: isLoading ? "#ccc" : "#0070f3",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: isLoading ? "not-allowed" : "pointer"
+          }}
+        >
+          {isLoading ? "Logging in..." : "Login"}
         </button>
       </form>
 
-      <p style={{ marginTop: "20px", fontSize: "12px" }}>
-        Use: user/user or admin/admin
-      </p>
+      <div style={{ marginTop: "20px", fontSize: "12px" }}>
+        <p><strong>DummyJSON Test Credentials:</strong></p>
+        <p>Username: <code>emilys</code></p>
+        <p>Password: <code>emilyspass</code></p>
+        <p style={{ marginTop: "10px", fontSize: "11px", color: "#666" }}>
+          Note: This will login as 'emilys' with admin privileges
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,30 +1,46 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 
 interface AuthCheckProps {
   children: React.ReactNode
   requiredRole?: 'user' | 'admin'
 }
 
-export default function AuthCheck({ children, requiredRole = 'user' }: AuthCheckProps) {
+export default function AuthCheck({
+  children,
+  requiredRole = 'user'
+}: AuthCheckProps) {
   const router = useRouter()
+  const { isAuthenticated, userRole, isLoading } = useAuth()
 
-  useEffect(() => {
-    const token = localStorage.getItem('auth-token')
-    const role = localStorage.getItem('user-role')
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '200px'
+      }}>
+        Loading...
+      </div>
+    )
+  }
 
-    if (!token) {
-      router.push('/login?error=login-required')
-      return
-    }
+  // Not authenticated - redirect to login
+  if (!isAuthenticated) {
+    router.push('/login')
+    return null
+  }
 
-    if (requiredRole === 'admin' && role !== 'admin') {
-      router.push('/login?error=admin-required')
-      return
-    }
-  }, [router, requiredRole])
+  // Wrong role - redirect to login
+  if (requiredRole === 'admin' && userRole !== 'admin') {
+    router.push('/login')
+    return null
+  }
 
+  // Authenticated with correct role - render children
   return <>{children}</>
 }
