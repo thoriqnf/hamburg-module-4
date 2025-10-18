@@ -24,3 +24,48 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom animations for cart badge */
+@keyframes pulse-once {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-once {
+  animation: pulse-once 0.3s ease-in-out;
+}
+
+/* Smooth transitions for cart count changes */
+.cart-count-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effects for better UX */
+.cart-button-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.cart-button-hover:hover {
+  transform: translateY(-1px);
+}
+
+/* Focus styles for accessibility */
+.cart-focus:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Mobile-friendly touch targets */
+@media (max-width: 640px) {
+  .cart-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

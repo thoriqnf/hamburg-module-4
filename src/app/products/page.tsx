@@ -7,12 +7,14 @@ import { api } from "@/lib/api";
 import { isAuthenticated, logout } from "@/lib/auth";
 import ProductCard from "@/components/ProductCard";
 import CartButton from "@/components/CartButton";
+import CartIcon from "@/components/CartIcon";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const router = useRouter();
 
   // Check authentication and fetch products
@@ -82,9 +84,15 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Cart Icon in Navbar */}
+              <CartIcon
+                onClick={() => setIsCartOpen(true)}
+                className="hover:bg-blue-50"
+              />
+
               <button
                 onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Logout
               </button>
@@ -188,8 +196,8 @@ export default function ProductsPage() {
         )}
       </main>
 
-      {/* Floating Cart Button */}
-      <CartButton />
+      {/* Floating Cart Button - Now uses shared state */}
+      <CartButton isOpen={isCartOpen} onOpenChange={setIsCartOpen} />
     </div>
   );
 }

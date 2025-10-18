@@ -1,11 +1,23 @@
 "use client";
 
 import { useCart } from '@/context/CartContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function CartButton() {
+interface CartButtonProps {
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export default function CartButton({ isOpen: externalIsOpen, onOpenChange }: CartButtonProps = {}) {
   const { totalItems, totalPrice, items } = useCart();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+
+  // Use external state if provided, otherwise use internal state
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
+  const setIsOpen = onOpenChange || setInternalIsOpen;
+
+  // Beginner-friendly logging for debugging
+  console.log('CartButton rendering - IsOpen:', isOpen, 'Items:', totalItems);
 
   return (
     <>

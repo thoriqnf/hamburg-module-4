@@ -3,17 +3,61 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { isAuthenticated } from "@/lib/auth";
+import CartIcon from "@/components/CartIcon";
+import CartButton from "@/components/CartButton";
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="text-center max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white">
+      {/* Simple Navbar */}
+      <header className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                Shop & Learn
+              </Link>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {/* Cart Icon - Only show when logged in */}
+              {isLoggedIn && (
+                <CartIcon
+                  onClick={() => setIsCartOpen(true)}
+                  className="hover:bg-blue-50"
+                />
+              )}
+
+              {isLoggedIn ? (
+                <Link
+                  href="/products"
+                  className="text-blue-600 hover:text-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Shop
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Login
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex items-center justify-center px-4 min-h-[calc(100vh-4rem)]">
+        <div className="text-center max-w-4xl mx-auto">
         {/* Hero Section */}
         <div className="border border-gray-200 rounded-lg p-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -112,7 +156,13 @@ export default function Home() {
             <p className="mt-1">🎯 Perfect for beginners to understand React concepts</p>
           </div>
         </div>
+        </div>
       </div>
+
+      {/* Floating Cart Button - Only when logged in */}
+      {isLoggedIn && (
+        <CartButton isOpen={isCartOpen} onOpenChange={setIsCartOpen} />
+      )}
     </div>
   );
 }
