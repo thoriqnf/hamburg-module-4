@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { setCookie, getCookie, isAuthenticated } from "@/lib/auth";
+import { api } from "@/lib/api";
+import LoginButton from "@/components/LoginButton";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("emilys");
@@ -9,35 +12,11 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Simple cookie helper functions
-  const setCookie = (name: string, value: string, minutes: number = 30) => {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (minutes * 60 * 1000));
-    document.cookie = `${name}=${value}; path=/; expires=${expires.toUTCString()}`;
-  };
-
-  const getCookie = (name: string): string | null => {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith(`${name}=`))
-      ?.split('=')[1] || null;
-  };
-
-  // Simple role assignment
-  const getUserRole = (username: string): 'admin' | 'user' => {
-    return username === 'emilys' ? 'admin' : 'user';
-  };
-
-  // Check if already logged in
+  // Check if already logged in and redirect
   useEffect(() => {
-    const token = getCookie('auth-token');
-    const savedUsername = getCookie('username');
-    if (token && savedUsername) {
-      const userRole = getUserRole(savedUsername);
-      const redirect = userRole === "admin" ? "/admin" : "/user";
-      router.push(redirect);
+    if (isAuthenticated()) {
+      router.push("/products");
     }
   }, [router]);
 
@@ -48,44 +27,24 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Direct API call to DummyJSON
-      const response = await fetch('https://dummyjson.com/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          password,
-          expiresInMins: 30,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
-      const data = await response.json();
+      // Call login API
+      const data = await api.login(username, password);
 
       // Store authentication data in cookies
       setCookie('auth-token', data.token, 30);
-      setCookie('username', username, 30);
-      setCookie('user-role', getUserRole(username), 30);
+      setCookie('username', data.username, 30);
+      setCookie('user-data', JSON.stringify(data), 30);
 
       // Get and cache user data
-      const userResponse = await fetch('https://dummyjson.com/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${data.token}`,
-        },
-      });
-
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
+      try {
+        const userData = await api.getCurrentUser(data.token);
         setCookie('user-data', JSON.stringify(userData), 30);
+      } catch (userError) {
+        console.log("Failed to fetch user data, but login succeeded");
       }
 
-      // Redirect based on role
-      const userRole = getUserRole(username);
-      const redirect = userRole === "admin" ? "/admin" : "/user";
-      router.push(redirect);
+      // Redirect to products page
+      router.push("/products");
 
     } catch (error) {
       setError("Login failed. Please check your credentials.");
@@ -95,62 +54,85 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Login</h1>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <form
-        onSubmit={handleLogin}
-        style={{ maxWidth: "300px", margin: "0 auto" }}
-      >
-        <div style={{ marginBottom: "10px" }}>
-          <label>Username:</label>
-          <br />
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{ width: "100%", padding: "5px" }}
-            required
-          />
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="max-w-md w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600">
+            Sign in to access our product catalog
+          </p>
         </div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Password:</label>
-          <br />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "5px" }}
-            required
-          />
+        {/* Login Form */}
+        <div className="border border-gray-200 rounded-lg p-8">
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Username Field */}
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                Username
+              </label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Login Button */}
+            <LoginButton
+              type="submit"
+              isLoading={isLoading}
+              disabled={!username || !password}
+            />
+          </form>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              🎯 Demo Credentials
+            </h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <p><strong>Username:</strong> emilys</p>
+              <p><strong>Password:</strong> emilyspass</p>
+              <p className="mt-2 text-blue-600">
+                ✨ These are pre-filled for your convenience!
+              </p>
+            </div>
+          </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: isLoading ? "#ccc" : "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: isLoading ? "not-allowed" : "pointer"
-          }}
-        >
-          {isLoading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-
-      <div style={{ marginTop: "20px", fontSize: "12px" }}>
-        <p><strong>DummyJSON Test Credentials:</strong></p>
-        <p>Username: <code>emilys</code></p>
-        <p>Password: <code>emilyspass</code></p>
-        <p style={{ marginTop: "10px", fontSize: "11px", color: "#666" }}>
-          Note: This will login as 'emilys' with admin privileges
-        </p>
+        {/* Footer */}
+        <div className="text-center text-sm text-gray-500 mt-6">
+          <p>This is a demo application using DummyJSON API</p>
+        </div>
       </div>
     </div>
   );

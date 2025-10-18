@@ -1,56 +1,99 @@
 "use client";
-import { useContext, createContext, useState } from "react";
-// yang pertama kita buat dulu contextnya
 
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { CartItem, Product } from '@/types';
+
+// Cart context type definition
 type CartContextType = {
-  items: any;
-  totalItems: any;
-  totalPrice: any;
-  addItem: any;
+  items: CartItem[];
+  totalItems: number;
+  totalPrice: number;
+  addItem: (product: Product | CartItem) => void;
+  removeItem: (id: number) => void;
+  updateQuantity: (id: number, quantity: number) => void;
+  clearCart: () => void;
 };
 
-// 1. buat context, pake createContext
+// Create the context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 2. buatin dulu providernya, isi provider apa aja?
-// semua yang berhungan state /value dan function yang mengubah tersebut
-export const CartProvider = ({ children }: any) => {
-  const [items, setItems] = useState([
-    { id: 1, name: "baju merah", price: 1000000, quantity: 1 },
-    { id: 2, name: "baju ijo", price: 200000, quantity: 10 },
-    { id: 3, name: "baju ungu", price: 230000, quantity: 1100 },
-  ]);
+// Cart Provider component
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [items, setItems] = useState<CartItem[]>([]);
 
-  const addItem = (product: any) => {
-    setItems((currentItem) => {
-      const existingItem = currentItem.find((item) => item.id === product.id);
+  // Add item to cart
+  const addItem = (product: Product | CartItem) => {
+    setItems((currentItems) => {
+      const existingItem = currentItems.find((item) => item.id === product.id);
+
       if (existingItem) {
-        return currentItem.map((item) =>
+        // Item exists, increase quantity
+        return currentItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
+      } else {
+        // New item, add to cart
+        return [...currentItems, { ...product, quantity: 1 }];
       }
-
-      return [...currentItem, { ...product, quantity: 1 }];
     });
   };
 
+  // Remove item from cart
+  const removeItem = (id: number) => {
+    setItems((currentItems) =>
+      currentItems.filter((item) => item.id !== id)
+    );
+  };
+
+  // Update item quantity
+  const updateQuantity = (id: number, quantity: number) => {
+    if (quantity <= 0) {
+      removeItem(id);
+      return;
+    }
+
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === id ? { ...item, quantity } : item
+      )
+    );
+  };
+
+  // Clear cart
+  const clearCart = () => {
+    setItems([]);
+  };
+
+  // Calculate totals
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // semua nilai dan method HARUS DIKIRIM MELALUI VALUE
-  const value = { items, totalItems, totalPrice, addItem };
+  // Context value
+  const value = {
+    items,
+    totalItems,
+    totalPrice,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+  };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
 };
 
-// 3. kita buat custom hooks untuk consume level component
+// Custom hook to use cart context
 export const useCart = () => {
   const context = useContext(CartContext);
 
   if (context === undefined) {
-    throw new Error("cart provider error");
+    throw new Error('useCart must be used within a CartProvider');
   }
 
   return context;
