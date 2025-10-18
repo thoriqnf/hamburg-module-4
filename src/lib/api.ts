@@ -1,10 +1,6 @@
-// API calls to DummyJSON
-// Simple fetch functions for beginners to understand
-
 const BASE_URL = 'https://dummyjson.com';
 
 export const api = {
-  // Authentication
   login: async (username: string, password: string) => {
     const response = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
@@ -12,10 +8,8 @@ export const api = {
       body: JSON.stringify({
         username,
         password,
-        expiresInMins: 30, // optional, defaults to 60
+        expiresInMins: 30,
       }),
-      // Note: Removed credentials: 'include' due to CORS issues
-      // We'll handle cookies manually in the login page
     });
 
     if (!response.ok) {
@@ -25,7 +19,6 @@ export const api = {
     return response.json();
   },
 
-  // Get current user info
   getCurrentUser: async () => {
     const token = getCookie('accessToken');
 
@@ -34,7 +27,6 @@ export const api = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      // Note: No credentials needed since we'll send Authorization header
     });
 
     if (!response.ok) {
@@ -44,7 +36,6 @@ export const api = {
     return response.json();
   },
 
-  // Products
   getProducts: async (limit: number = 10) => {
     const response = await fetch(`${BASE_URL}/products?limit=${limit}`);
 
@@ -66,7 +57,6 @@ export const api = {
     return response.json();
   },
 
-  // Search products
   searchProducts: async (query: string) => {
     const response = await fetch(`${BASE_URL}/products/search?q=${query}`);
 
@@ -79,7 +69,6 @@ export const api = {
   }
 };
 
-// Helper function to get cookies (copied from lib/auth.ts to avoid circular imports)
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
   return document.cookie
