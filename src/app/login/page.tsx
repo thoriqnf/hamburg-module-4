@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { setCookie, getCookie, isAuthenticated } from "@/lib/auth";
+import { setCookie, isAuthenticated } from "@/lib/auth";
 import { api } from "@/lib/api";
 import LoginButton from "@/components/LoginButton";
 
@@ -30,18 +30,13 @@ export default function LoginPage() {
       // Call login API
       const data = await api.login(username, password);
 
-      // Store authentication data in cookies
-      setCookie('auth-token', data.token, 30);
+      console.log("Login successful:", data);
+
+      // Manually set cookies from the response
+      setCookie('accessToken', data.accessToken, 30);
+      setCookie('refreshToken', data.refreshToken, 30);
       setCookie('username', data.username, 30);
       setCookie('user-data', JSON.stringify(data), 30);
-
-      // Get and cache user data
-      try {
-        const userData = await api.getCurrentUser(data.token);
-        setCookie('user-data', JSON.stringify(userData), 30);
-      } catch (userError) {
-        console.log("Failed to fetch user data, but login succeeded");
-      }
 
       // Redirect to products page
       router.push("/products");

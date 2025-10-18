@@ -1,3 +1,4 @@
+// Basic types for our beginner-friendly demo
 export interface Product {
   id: number;
   title: string;
@@ -33,5 +34,6 @@ export interface AuthResponse {
   lastName: string;
   gender: string;
   image: string;
-  token: string;
+  accessToken: string; // JWT accessToken (for backward compatibility) in response and cookies
+  refreshToken: string; // refreshToken in response and cookies
 }

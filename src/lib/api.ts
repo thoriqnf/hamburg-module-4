@@ -12,8 +12,10 @@ export const api = {
       body: JSON.stringify({
         username,
         password,
-        expiresInMins: 30,
+        expiresInMins: 30, // optional, defaults to 60
       }),
+      // Note: Removed credentials: 'include' due to CORS issues
+      // We'll handle cookies manually in the login page
     });
 
     if (!response.ok) {
@@ -24,11 +26,15 @@ export const api = {
   },
 
   // Get current user info
-  getCurrentUser: async (token: string) => {
+  getCurrentUser: async () => {
+    const token = getCookie('accessToken');
+
     const response = await fetch(`${BASE_URL}/auth/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
+      // Note: No credentials needed since we'll send Authorization header
     });
 
     if (!response.ok) {
@@ -72,3 +78,12 @@ export const api = {
     return data.products;
   }
 };
+
+// Helper function to get cookies (copied from lib/auth.ts to avoid circular imports)
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${name}=`))
+    ?.split('=')[1] || null;
+}

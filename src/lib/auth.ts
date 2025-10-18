@@ -19,14 +19,20 @@ export const removeCookie = (name: string) => {
 };
 
 export const isAuthenticated = (): boolean => {
-  const token = getCookie('auth-token');
-  const username = getCookie('username');
-  return !!(token && username);
+  const accessToken = getCookie('accessToken');
+  const refreshToken = getCookie('refreshToken');
+  return !!(accessToken && refreshToken);
 };
 
 export const logout = () => {
+  // Remove DummyJSON authentication cookies
+  removeCookie('accessToken');
+  removeCookie('refreshToken');
+
+  // Remove any manually set cookies
   removeCookie('auth-token');
   removeCookie('username');
   removeCookie('user-data');
+
   window.location.href = '/login';
 };
