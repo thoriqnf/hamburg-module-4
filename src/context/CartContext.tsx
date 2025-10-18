@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from "react";
 
+// 2. buat type, type tergantung data yang mau dibuat
 type CartContextType = {
   items: any[];
   totalItems: number;
@@ -12,8 +13,10 @@ type CartContextType = {
   clearCart: () => void;
 };
 
+// 1. buat context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// 3. buat provider
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<any[]>([]);
 
@@ -25,7 +28,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return currentItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item
+            : item,
         );
       } else {
         return [...currentItems, { ...product, quantity: 1 }];
@@ -34,9 +37,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeItem = (id: number) => {
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.id !== id)
-    );
+    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
   };
 
   const updateQuantity = (id: number, quantity: number) => {
@@ -47,8 +48,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
+        item.id === id ? { ...item, quantity } : item,
+      ),
     );
   };
 
@@ -57,7 +58,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   const value = {
     items,
@@ -69,18 +73,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     clearCart,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
+// 4. buat custom hook
 export const useCart = () => {
   const context = useContext(CartContext);
 
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
 
   return context;

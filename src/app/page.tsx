@@ -8,6 +8,7 @@ import CartIcon from "@/components/CartIcon";
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // dipanggil dalam useeffect karena dia paling awal untuk mengetahui apakah user sudah login atau belum
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
   }, []);

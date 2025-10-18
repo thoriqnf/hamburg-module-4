@@ -15,9 +15,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Shop & Learn - React Demo",
-  description: "A beginner-friendly React demo showcasing authentication, API integration, and shopping cart functionality",
+  description:
+    "A beginner-friendly React demo showcasing authentication, API integration, and shopping cart functionality",
   icons: {
-    icon: '/favicon.ico',
+    icon: "/favicon.ico",
   },
 };
 
@@ -31,9 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <CartProvider>{children}</CartProvider>
       </body>
     </html>
   );
