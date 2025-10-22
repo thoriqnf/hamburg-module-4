@@ -3,6 +3,40 @@
 
 const BASE_URL = 'https://dummyjson.com';
 
+// Types based on DummyJSON API structure
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  image: string;
+}
+
+export interface UsersResponse {
+  users: User[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+export interface Product {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  brand: string;
+  category: string;
+  thumbnail: string;
+}
+
+export interface ProductsResponse {
+  products: Product[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
 export const api = {
   // Authentication
   login: async (username: string, password: string) => {
@@ -44,8 +78,29 @@ export const api = {
     return response.json();
   },
 
-  // Products
-  getProducts: async (limit: number = 10) => {
+  // Users - NEW: For async testing examples
+  getUsers: async (): Promise<UsersResponse> => {
+    const response = await fetch(`${BASE_URL}/users`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+
+    return response.json();
+  },
+
+  getUserById: async (id: number): Promise<User> => {
+    const response = await fetch(`${BASE_URL}/users/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user with ID ${id}`);
+    }
+
+    return response.json();
+  },
+
+  // Products (existing)
+  getProducts: async (limit: number = 10): Promise<Product[]> => {
     const response = await fetch(`${BASE_URL}/products?limit=${limit}`);
 
     if (!response.ok) {
@@ -56,7 +111,7 @@ export const api = {
     return data.products;
   },
 
-  getProduct: async (id: number) => {
+  getProduct: async (id: number): Promise<Product> => {
     const response = await fetch(`${BASE_URL}/products/${id}`);
 
     if (!response.ok) {
@@ -66,17 +121,52 @@ export const api = {
     return response.json();
   },
 
-  // Search products
-  searchProducts: async (query: string) => {
-    const response = await fetch(`${BASE_URL}/products/search?q=${query}`);
+  // Search products (enhanced)
+  searchProducts: async (query: string): Promise<ProductsResponse> => {
+    const response = await fetch(`${BASE_URL}/products/search?q=${encodeURIComponent(query)}`);
 
     if (!response.ok) {
       throw new Error('Failed to search products');
     }
 
-    const data = await response.json();
-    return data.products;
+    return response.json();
+  },
+
+  // NEW: Error simulation for testing error states
+  triggerError: async (): Promise<void> => {
+    const response = await fetch(`${BASE_URL}/error`);
+
+    if (!response.ok) {
+      throw new Error('Simulated API error for testing');
+    }
+
+    return response.json();
   }
+};
+
+// Helper function to simulate delay for testing loading states
+export const delay = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+// Wrapper functions with optional delay for testing
+export const apiWithDelay = {
+  ...api,
+
+  async getUsersWithDelay(ms = 1000): Promise<UsersResponse> {
+    await delay(ms);
+    return api.getUsers();
+  },
+
+  async getProductsDelay(limit = 10, ms = 800): Promise<Product[]> {
+    await delay(ms);
+    return api.getProducts(limit);
+  },
+
+  async searchProductsWithDelay(query: string, ms = 600): Promise<ProductsResponse> {
+    await delay(ms);
+    return api.searchProducts(query);
+  },
 };
 
 // Helper function to get cookies (copied from lib/auth.ts to avoid circular imports)
