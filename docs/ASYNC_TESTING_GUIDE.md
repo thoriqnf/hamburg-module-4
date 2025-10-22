@@ -24,71 +24,46 @@ Your project comes with:
 - ✅ Axios for API calls
 - ✅ Basic test configuration
 
-### What We Added
+### What We Use
 
-```bash
-npm install -D msw
-```
-
-**MSW (Mock Service Worker)** - Mocks API requests at the network level, providing realistic testing scenarios.
+**Jest Mocks** - Simple, fast, and easy to understand approach for mocking API calls. Perfect for learning and most scenarios.
 
 ### Project Structure
 
 ```
 src/
 ├── components/
-│   ├── UserList.tsx              # Example async component
-│   ├── ProductSearch.tsx         # Another async component
+│   ├── UserList.tsx                     # Example async component
+│   ├── ProductSearch.tsx                # Another async component
 │   └── __tests__/
-│       ├── UserList.test.tsx     # Jest mocks approach
-│       └── UserList.msw.test.tsx # MSW integration approach
+│       └── UserList.simple-async.test.tsx # Working async tests
 ├── lib/
-│   └── api.ts                    # API utility functions
-├── mocks/
-│   ├── handlers.ts               # MSW API handlers
-│   └── browser.ts                # MSW browser setup
-└── setupTests.ts                 # Test configuration
+│   └── api.ts                           # API utility functions
+└── setupTests.ts                        # Test configuration
 ```
 
-## 🎯 Two Approaches to Async Testing
+## 🎯 Our Chosen Approach: Jest Mocks ⚡
 
-### 1. Jest Mocks (Simple Approach) ⚡
+**Why we use Jest Mocks:**
+- 🎯 **Perfect for learning** - Easy to understand and debug
+- ⚡ **Very fast** - Tests run in milliseconds, not seconds
+- 🔧 **Simple setup** - No complex configuration needed
+- 🧪 **Great for teaching** - Students can see exactly what's being mocked
 
 **When to use:**
 - Unit tests for individual components
-- Fast execution is important
 - Testing component logic in isolation
-- Simple API responses
+- Fast development and iteration
+- Learning async testing concepts
 
-**Pros:**
-- ⚡ Very fast execution
+**Benefits:**
+- ⚡ Very fast execution (milliseconds)
 - 🎯 Simple setup and configuration
 - 🔧 Easy to control mock responses
-- 🧪 Perfect for unit testing
+- 🧪 Perfect for teaching and learning
+- 🐛 Easy to debug when tests fail
 
-**Cons:**
-- 🤖 Doesn't test actual network requests
-- 🎭 Less realistic than real API calls
-- 🔄 Requires manual mocking for each test
-
-### 2. MSW Integration (Realistic Approach) 🌐
-
-**When to use:**
-- Integration tests
-- Testing loading states and error handling
-- End-to-end component testing
-- Realistic user scenarios
-
-**Pros:**
-- 🌐 Tests actual network requests
-- 🎭 Realistic loading states and delays
-- 🔄 Automatic request/response handling
-- 🛡️ Works with real API logic
-
-**Cons:**
-- ⏱️ Slower execution (network delays)
-- 🔧 More complex setup
-- 💾 Higher memory usage
+**Note:** This approach covers 95% of real-world testing needs. MSW is great for advanced scenarios but adds complexity that's not needed for learning.
 
 ## 🔧 Jest Mocks (Simple Approach)
 
