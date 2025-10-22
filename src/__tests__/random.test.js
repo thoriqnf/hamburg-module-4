@@ -1,3 +1,7 @@
+// mainly jest hanya bisa dipakai untuk testing js app biasa
+// apakah bisa untuk test html?
+// apakah bisa untuk test react?
+
 test("ini test pertama", () => {
   expect(1 + 1).toBe(2); // happy path / positive case
   expect(1 + 1).not.toBe(1); // kita mau negative case, artinya wajib salah
