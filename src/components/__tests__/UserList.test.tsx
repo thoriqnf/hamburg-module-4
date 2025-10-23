@@ -38,16 +38,21 @@ const mockUserResponse = {
 describe("UserList Component - Comprehensive Testing", () => {
   beforeEach(() => {
     // Clear all mocks before each test
+    // setiap sebelum test akan mulai dari mocks kosong
     jest.clearAllMocks();
   });
 
+  // fase 1 persiapan aja
   describe("Initial Rendering", () => {
+    // disini testing awal masih kosong, cmn mengecheck structure
     test("renders component structure correctly", () => {
       mockApi.getUsers.mockImplementation(() => new Promise(() => {}));
 
       render(<UserList />);
 
-      expect(screen.getByRole("heading", { name: "User List" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "User List" }),
+      ).toBeInTheDocument();
       expect(screen.getByTestId("refresh-button")).toBeInTheDocument();
       expect(screen.getByTestId("loading-state")).toBeInTheDocument();
     });
@@ -63,424 +68,437 @@ describe("UserList Component - Comprehensive Testing", () => {
     });
   });
 
-  describe("API Success Scenarios", () => {
-    test("renders users successfully after API call", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  // fase 2 api success
+  // describe("API Success Scenarios", () => {
+  //   test("renders users successfully after API call", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+
+  //     render(<UserList />);
+
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
+
+  //     expect(screen.getByText("Total users: 2")).toBeInTheDocument();
+  //     expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //     expect(screen.getByTestId("user-card-2")).toBeInTheDocument();
+  //     expect(screen.getByText("John Doe")).toBeInTheDocument();
+  //     expect(screen.getByText("Jane Smith")).toBeInTheDocument();
+  //     expect(screen.getByText("@johndoe")).toBeInTheDocument();
+  //     expect(screen.getByText("@janesmith")).toBeInTheDocument();
+  //   });
 
-      render(<UserList />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("displays empty state when no users are returned", async () => {
+  //     const emptyResponse = {
+  //       users: [],
+  //       total: 0,
+  //       skip: 0,
+  //       limit: 0,
+  //     };
+  //     mockApi.getUsers.mockResolvedValue(emptyResponse);
 
-      expect(screen.getByText("Total users: 2")).toBeInTheDocument();
-      expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-      expect(screen.getByTestId("user-card-2")).toBeInTheDocument();
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-      expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-      expect(screen.getByText("@johndoe")).toBeInTheDocument();
-      expect(screen.getByText("@janesmith")).toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("displays empty state when no users are returned", async () => {
-      const emptyResponse = {
-        users: [],
-        total: 0,
-        skip: 0,
-        limit: 0,
-      };
-      mockApi.getUsers.mockResolvedValue(emptyResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     expect(screen.getByText("Total users: 0")).toBeInTheDocument();
+  //     expect(screen.queryByTestId("user-card-1")).not.toBeInTheDocument();
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("displays users in correct order", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      expect(screen.getByText("Total users: 0")).toBeInTheDocument();
-      expect(screen.queryByTestId("user-card-1")).not.toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("displays users in correct order", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     const userCards = screen.getAllByTestId(/user-card-/);
+  //     expect(userCards).toHaveLength(2);
+  //     expect(userCards[0]).toHaveAttribute("data-testid", "user-card-1");
+  //     expect(userCards[1]).toHaveAttribute("data-testid", "user-card-2");
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  // describe("API Error Scenarios", () => {
+  //   test("displays error message when API call fails", async () => {
+  //     const errorMessage = "Failed to fetch users";
+  //     mockApi.getUsers.mockRejectedValue(new Error(errorMessage));
 
-      const userCards = screen.getAllByTestId(/user-card-/);
-      expect(userCards).toHaveLength(2);
-      expect(userCards[0]).toHaveAttribute("data-testid", "user-card-1");
-      expect(userCards[1]).toHaveAttribute("data-testid", "user-card-2");
-    });
-  });
+  //     render(<UserList />);
 
-  describe("API Error Scenarios", () => {
-    test("displays error message when API call fails", async () => {
-      const errorMessage = "Failed to fetch users";
-      mockApi.getUsers.mockRejectedValue(new Error(errorMessage));
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("error-state")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
+  //     expect(screen.getByText("Try Again")).toBeInTheDocument();
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("error-state")).toBeInTheDocument();
-      });
+  //   test("allows retry after error", async () => {
+  //     mockApi.getUsers
+  //       .mockRejectedValueOnce(new Error("Network error"))
+  //       .mockResolvedValueOnce(mockUserResponse);
 
-      expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
-      expect(screen.getByText("Try Again")).toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("allows retry after error", async () => {
-      mockApi.getUsers
-        .mockRejectedValueOnce(new Error("Network error"))
-        .mockResolvedValueOnce(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("error-state")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByText("Try Again"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("error-state")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      fireEvent.click(screen.getByText("Try Again"));
+  //     expect(screen.getByText("Total users: 2")).toBeInTheDocument();
+  //     expect(mockApi.getUsers).toHaveBeenCalledTimes(2);
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("handles non-Error objects in error handling", async () => {
+  //     mockApi.getUsers.mockRejectedValue("String error");
 
-      expect(screen.getByText("Total users: 2")).toBeInTheDocument();
-      expect(mockApi.getUsers).toHaveBeenCalledTimes(2);
-    });
+  //     render(<UserList />);
 
-    test("handles non-Error objects in error handling", async () => {
-      mockApi.getUsers.mockRejectedValue("String error");
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("error-state")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     expect(
+  //       screen.getByText("Error: Failed to fetch users"),
+  //     ).toBeInTheDocument();
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("error-state")).toBeInTheDocument();
-      });
+  // describe("Refresh Functionality", () => {
+  //   test("refresh functionality works correctly", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      expect(screen.getByText("Error: Failed to fetch users")).toBeInTheDocument();
-    });
-  });
+  //     render(<UserList />);
 
-  describe("Refresh Functionality", () => {
-    test("refresh functionality works correctly", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByTestId("refresh-button"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     expect(screen.getByTestId("loading-state")).toBeInTheDocument();
+  //     expect(screen.getByTestId("refresh-button")).toBeDisabled();
 
-      fireEvent.click(screen.getByTestId("refresh-button"));
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      expect(screen.getByTestId("loading-state")).toBeInTheDocument();
-      expect(screen.getByTestId("refresh-button")).toBeDisabled();
+  //     // toHaveBeenCalledTimes, kenapa? karena disini kita ingin tau berapa kali sudah dipanggil
+  //     expect(mockApi.getUsers).toHaveBeenCalledTimes(2);
+  //     // kenapa lebih pilih cek apakah function ke panggil daripada cek hasilnya?
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("reset selected user on refresh", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById.mockResolvedValue(mockUsers[0]);
 
-      expect(mockApi.getUsers).toHaveBeenCalledTimes(2);
-    });
+  //     render(<UserList />);
 
-    test("reset selected user on refresh", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById.mockResolvedValue(mockUsers[0]);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("selected-user")).toBeInTheDocument();
+  //     });
 
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     fireEvent.click(screen.getByTestId("refresh-button"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("selected-user")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      fireEvent.click(screen.getByTestId("refresh-button"));
+  //     expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  // describe("User Selection Scenarios", () => {
+  //   test("handles user selection correctly", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById.mockResolvedValue(mockUsers[0]);
 
-      expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
-    });
-  });
+  //     render(<UserList />);
 
-  describe("User Selection Scenarios", () => {
-    test("handles user selection correctly", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById.mockResolvedValue(mockUsers[0]);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("selected-user")).toBeInTheDocument();
+  //     });
 
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     expect(screen.getByText("Selected User Details")).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.getByTestId("selected-user")).toBeInTheDocument();
-      });
+  //     const selectedUserSection = screen.getByTestId("selected-user");
+  //     expect(selectedUserSection).toHaveTextContent("John Doe");
+  //     expect(selectedUserSection).toHaveTextContent("Username: johndoe");
+  //     expect(selectedUserSection).toHaveTextContent(
+  //       "Email: john.doe@example.com",
+  //     );
+  //     expect(selectedUserSection).toHaveTextContent("ID: 1");
 
-      expect(screen.getByText("Selected User Details")).toBeInTheDocument();
+  //     expect(mockApi.getUserById).toHaveBeenCalledWith(1);
+  //   });
 
-      const selectedUserSection = screen.getByTestId("selected-user");
-      expect(selectedUserSection).toHaveTextContent("John Doe");
-      expect(selectedUserSection).toHaveTextContent("Username: johndoe");
-      expect(selectedUserSection).toHaveTextContent("Email: john.doe@example.com");
-      expect(selectedUserSection).toHaveTextContent("ID: 1");
+  //   test("handles user selection error correctly", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById.mockRejectedValue(new Error("User not found"));
 
-      expect(mockApi.getUserById).toHaveBeenCalledWith(1);
-    });
+  //     render(<UserList />);
 
-    test("handles user selection error correctly", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById.mockRejectedValue(new Error("User not found"));
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     // Wait for error to be handled
+  //     await waitFor(
+  //       () => {
+  //         expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
+  //       },
+  //       { timeout: 2000 },
+  //     );
 
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     // Check that error was set in state (might be displayed differently)
+  //     expect(mockApi.getUserById).toHaveBeenCalledWith(1);
+  //     expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //   });
 
-      // Wait for error to be handled
-      await waitFor(() => {
-        expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
-      }, { timeout: 2000 });
+  //   test("handles non-Error objects in user selection error", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById.mockRejectedValue("String error");
 
-      // Check that error was set in state (might be displayed differently)
-      expect(mockApi.getUserById).toHaveBeenCalledWith(1);
-      expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("handles non-Error objects in user selection error", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById.mockRejectedValue("String error");
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     // Wait for error to be handled
+  //     await waitFor(
+  //       () => {
+  //         expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
+  //       },
+  //       { timeout: 2000 },
+  //     );
 
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     // Verify the error was handled
+  //     expect(mockApi.getUserById).toHaveBeenCalledWith(1);
+  //     expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //   });
 
-      // Wait for error to be handled
-      await waitFor(() => {
-        expect(screen.queryByTestId("selected-user")).not.toBeInTheDocument();
-      }, { timeout: 2000 });
+  //   test("selects different users correctly", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById
+  //       .mockResolvedValueOnce(mockUsers[0])
+  //       .mockResolvedValueOnce(mockUsers[1]);
 
-      // Verify the error was handled
-      expect(mockApi.getUserById).toHaveBeenCalledWith(1);
-      expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("selects different users correctly", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById
-        .mockResolvedValueOnce(mockUsers[0])
-        .mockResolvedValueOnce(mockUsers[1]);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     // Select first user
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("selected-user")).toBeInTheDocument();
+  //     });
 
-      // Select first user
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     const selectedUserSection = screen.getByTestId("selected-user");
+  //     expect(selectedUserSection).toHaveTextContent("John Doe");
 
-      await waitFor(() => {
-        expect(screen.getByTestId("selected-user")).toBeInTheDocument();
-      });
+  //     // Select second user
+  //     fireEvent.click(screen.getByTestId("user-card-2"));
 
-      const selectedUserSection = screen.getByTestId("selected-user");
-      expect(selectedUserSection).toHaveTextContent("John Doe");
+  //     await waitFor(() => {
+  //       expect(selectedUserSection).toHaveTextContent("Jane Smith");
+  //     });
 
-      // Select second user
-      fireEvent.click(screen.getByTestId("user-card-2"));
+  //     expect(mockApi.getUserById).toHaveBeenCalledTimes(2);
+  //     expect(mockApi.getUserById).toHaveBeenNthCalledWith(1, 1);
+  //     expect(mockApi.getUserById).toHaveBeenNthCalledWith(2, 2);
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(selectedUserSection).toHaveTextContent("Jane Smith");
-      });
+  // describe("Accessibility Tests", () => {
+  //   test("has proper ARIA attributes", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      expect(mockApi.getUserById).toHaveBeenCalledTimes(2);
-      expect(mockApi.getUserById).toHaveBeenNthCalledWith(1, 1);
-      expect(mockApi.getUserById).toHaveBeenNthCalledWith(2, 2);
-    });
-  });
+  //     render(<UserList />);
 
-  describe("Accessibility Tests", () => {
-    test("has proper ARIA attributes", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     // Check for proper structure and accessibility
+  //     expect(screen.getByRole("heading", { name: "User List" })).toBeInTheDocument();
+  //     expect(screen.getByRole("button", { name: "Refresh" })).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     // User cards are clickable divs with onClick handlers, not button elements
+  //     expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //     expect(screen.getByTestId("user-card-2")).toBeInTheDocument();
+  //   });
 
-      // Check for proper structure and accessibility
-      expect(screen.getByRole("heading", { name: "User List" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Refresh" })).toBeInTheDocument();
+  //   test("images have proper alt text", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      // User cards are clickable divs with onClick handlers, not button elements
-      expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-      expect(screen.getByTestId("user-card-2")).toBeInTheDocument();
-    });
+  //     render(<UserList />);
 
-    test("images have proper alt text", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     const images = screen.getAllByRole("img");
+  //     expect(images).toHaveLength(2);
+  //     expect(images[0]).toHaveAttribute("alt", "John Doe");
+  //     expect(images[1]).toHaveAttribute("alt", "Jane Smith");
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  // describe("API Call Behavior", () => {
+  //   test("API is called only once on initial render", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      const images = screen.getAllByRole("img");
-      expect(images).toHaveLength(2);
-      expect(images[0]).toHaveAttribute("alt", "John Doe");
-      expect(images[1]).toHaveAttribute("alt", "Jane Smith");
-    });
-  });
+  //     render(<UserList />);
 
-  describe("API Call Behavior", () => {
-    test("API is called only once on initial render", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     expect(mockApi.getUsers).toHaveBeenCalledTimes(1);
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("API is called with correct parameters", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      expect(mockApi.getUsers).toHaveBeenCalledTimes(1);
-    });
+  //     render(<UserList />);
 
-    test("API is called with correct parameters", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     expect(mockApi.getUsers).toHaveBeenCalledWith();
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  // describe("Component Lifecycle", () => {
+  //   test("cleans up properly on unmount", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
 
-      expect(mockApi.getUsers).toHaveBeenCalledWith();
-    });
-  });
+  //     const { unmount } = render(<UserList />);
 
-  describe("Component Lifecycle", () => {
-    test("cleans up properly on unmount", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      const { unmount } = render(<UserList />);
+  //     expect(() => unmount()).not.toThrow();
+  //   });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //   test("handles rapid state changes", async () => {
+  //     mockApi.getUsers.mockResolvedValue(mockUserResponse);
+  //     mockApi.getUserById.mockResolvedValue(mockUsers[0]);
 
-      expect(() => unmount()).not.toThrow();
-    });
+  //     render(<UserList />);
 
-    test("handles rapid state changes", async () => {
-      mockApi.getUsers.mockResolvedValue(mockUserResponse);
-      mockApi.getUserById.mockResolvedValue(mockUsers[0]);
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("users-grid")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
+  //     // Rapid clicking should not cause issues
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
+  //     fireEvent.click(screen.getByTestId("user-card-1"));
 
-      await waitFor(() => {
-        expect(screen.getByTestId("users-grid")).toBeInTheDocument();
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("selected-user")).toBeInTheDocument();
+  //     });
 
-      // Rapid clicking should not cause issues
-      fireEvent.click(screen.getByTestId("user-card-1"));
-      fireEvent.click(screen.getByTestId("user-card-1"));
-      fireEvent.click(screen.getByTestId("user-card-1"));
+  //     expect(screen.getByTestId("selected-user")).toBeInTheDocument();
+  //   });
+  // });
 
-      await waitFor(() => {
-        expect(screen.getByTestId("selected-user")).toBeInTheDocument();
-      });
+  // describe("Edge Cases", () => {
+  //   test("handles very long usernames", async () => {
+  //     const longUsername = "verylongusernamethatmightbreakthelayout";
+  //     const userWithLongUsername = {
+  //       ...mockUsers[0],
+  //       username: longUsername,
+  //     };
 
-      expect(screen.getByTestId("selected-user")).toBeInTheDocument();
-    });
-  });
+  //     mockApi.getUsers.mockResolvedValue({
+  //       users: [userWithLongUsername],
+  //       total: 1,
+  //       skip: 0,
+  //       limit: 1,
+  //     });
 
-  describe("Edge Cases", () => {
-    test("handles very long usernames", async () => {
-      const longUsername = "verylongusernamethatmightbreakthelayout";
-      const userWithLongUsername = {
-        ...mockUsers[0],
-        username: longUsername,
-      };
+  //     render(<UserList />);
 
-      mockApi.getUsers.mockResolvedValue({
-        users: [userWithLongUsername],
-        total: 1,
-        skip: 0,
-        limit: 1,
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByText(`@${longUsername}`)).toBeInTheDocument();
+  //     });
+  //   });
 
-      render(<UserList />);
+  //   test("handles very long email addresses", async () => {
+  //     const longEmail = "very.long.email.address@very.long.domain.name.com";
+  //     const userWithLongEmail = {
+  //       ...mockUsers[0],
+  //       email: longEmail,
+  //     };
 
-      await waitFor(() => {
-        expect(screen.getByText(`@${longUsername}`)).toBeInTheDocument();
-      });
-    });
+  //     mockApi.getUsers.mockResolvedValue({
+  //       users: [userWithLongEmail],
+  //       total: 1,
+  //       skip: 0,
+  //       limit: 1,
+  //     });
 
-    test("handles very long email addresses", async () => {
-      const longEmail = "very.long.email.address@very.long.domain.name.com";
-      const userWithLongEmail = {
-        ...mockUsers[0],
-        email: longEmail,
-      };
+  //     render(<UserList />);
 
-      mockApi.getUsers.mockResolvedValue({
-        users: [userWithLongEmail],
-        total: 1,
-        skip: 0,
-        limit: 1,
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByText(longEmail)).toBeInTheDocument();
+  //     });
+  //   });
 
-      render(<UserList />);
+  //   test("handles missing user image gracefully", async () => {
+  //     const userWithoutImage = {
+  //       ...mockUsers[0],
+  //       image: "",
+  //     };
 
-      await waitFor(() => {
-        expect(screen.getByText(longEmail)).toBeInTheDocument();
-      });
-    });
+  //     mockApi.getUsers.mockResolvedValue({
+  //       users: [userWithoutImage],
+  //       total: 1,
+  //       skip: 0,
+  //       limit: 1,
+  //     });
 
-    test("handles missing user image gracefully", async () => {
-      const userWithoutImage = {
-        ...mockUsers[0],
-        image: "",
-      };
+  //     render(<UserList />);
 
-      mockApi.getUsers.mockResolvedValue({
-        users: [userWithoutImage],
-        total: 1,
-        skip: 0,
-        limit: 1,
-      });
+  //     await waitFor(() => {
+  //       expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //     });
 
-      render(<UserList />);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-      });
-
-      expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
-    });
-  });
+  //     expect(screen.getByTestId("user-card-1")).toBeInTheDocument();
+  //   });
+  // });
 });
