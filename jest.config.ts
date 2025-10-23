@@ -18,6 +18,16 @@ const config: Config = {
   // Indicates which provider should be used to instrument code for coverage
   coverageProvider: "v8",
 
+  // Coverage thresholds - fail if coverage falls below these values
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  },
+
   // An array of file extensions your modules use
   moduleFileExtensions: [
     "js",
